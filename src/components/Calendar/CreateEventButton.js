@@ -1,7 +1,8 @@
-import React, { useContext } from "react";
-import GlobalContext from "./GlobalContext";
+import useStore from "./useStore";
+
 export default function CreateEventButton() {
-  const { setShowEventModal } = useContext(GlobalContext);
+  const setShowEventModal = useStore((state) => state.setShowEventModal);
+
   return (
     <button
       onClick={() => setShowEventModal(true)}

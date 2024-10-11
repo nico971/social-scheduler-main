@@ -1,28 +1,42 @@
+"use client"
+import React, { useState, useContext, useEffect } from "react";
 import ToasterContext from "@/app/api/contex/ToasetContex";
+import CalendarHeader from "@/components/Calendar/CalendarHeader";
 import Breadcrumb from "@/components/Common/Breadcrumb";
 import { authOptions } from "@/utils/auth"; // Chemin vers tes options NextAuth
 import { getServerSession } from "next-auth/next";
+import { getMonth } from "@/utils/dayjs";
+import Sidebar from "@/components/Calendar/Sidebar";
+import Month from "@/components/Calendar/Month";
+import GlobalContext from "@/components/Calendar/GlobalContext";
+import ContextWrapper from "@/components/Calendar/ContextWrapper";
+import EventModal from "@/components/Calendar/EventModal";
 
-export const metadata: Metadata = {
-  title: "Pricing Page | Play SaaS Starter Kit and Boilerplate for Next.js",
-  description: "This is pricing page description",
-};
+const CalendarPage =  () => {
+  const [currenMonth, setCurrentMonth] = useState(getMonth());
+  const { monthIndex, showEventModal } = useContext(GlobalContext);
 
-const CalendarPage = async () => {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    // Si l'utilisateur n'est pas connecté, on affiche un toaster et on redirige
-    return (
-      <>
-        <ToasterContext msg="Vous devez être connecté pour accéder à cette page." color="red" />
-      </>
-    );
-  }
+  useEffect(() => {
+    setCurrentMonth(getMonth(monthIndex));
+  }, [monthIndex]);
 
   return (
     <>
-      <Breadcrumb pageName="Calendar" />
+    <React.StrictMode>
+      <ContextWrapper>
+      <React.Fragment>
+        {showEventModal && <EventModal />}
+
+        <div className="h-screen flex flex-col">
+          <CalendarHeader />
+          <div className="flex flex-1">
+            <Sidebar />
+            <Month month={currenMonth} />
+          </div>
+        </div>
+      </React.Fragment>
+        </ContextWrapper>
+        </React.StrictMode>
     </>
   );
 };

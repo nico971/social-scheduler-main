@@ -13,7 +13,6 @@ const Dashboard = () => {
   return (
     <>
       <Breadcrumb pageName="Calendar" />
-      <PostSchedulerWrapper />
     </>
   );
 };

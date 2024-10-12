@@ -1,13 +1,13 @@
 import dayjs from "dayjs";
-import React, { useContext, useEffect, useState } from "react";
-import GlobalContext from "./GlobalContext";
+import React, { useEffect, useState } from "react";
+import useStore from "./useStore"; // Remplace GlobalContext par useStore
 import { getMonth } from "@/utils/dayjs";
+import { ChevronLeft,ChevronRight } from "lucide-react";
 
 export default function SmallCalendar() {
-  const [currentMonthIdx, setCurrentMonthIdx] = useState(
-    dayjs().month()
-  );
+  const [currentMonthIdx, setCurrentMonthIdx] = useState(dayjs().month());
   const [currentMonth, setCurrentMonth] = useState(getMonth());
+
   useEffect(() => {
     setCurrentMonth(getMonth(currentMonthIdx));
   }, [currentMonthIdx]);
@@ -17,7 +17,8 @@ export default function SmallCalendar() {
     setSmallCalendarMonth,
     setDaySelected,
     daySelected,
-  } = useContext(GlobalContext);
+    setMonthIndex
+  } = useStore();
 
   useEffect(() => {
     setCurrentMonthIdx(monthIndex);
@@ -26,9 +27,11 @@ export default function SmallCalendar() {
   function handlePrevMonth() {
     setCurrentMonthIdx(currentMonthIdx - 1);
   }
+
   function handleNextMonth() {
     setCurrentMonthIdx(currentMonthIdx + 1);
   }
+
   function getDayClass(day) {
     const format = "DD-MM-YY";
     const nowDay = dayjs().format(format);
@@ -42,26 +45,22 @@ export default function SmallCalendar() {
       return "";
     }
   }
+
   return (
     <div className="mt-9">
-      <header className="flex justify-between">
-        <p className="text-gray-500 font-bold">
-          {dayjs(new Date(dayjs().year(), currentMonthIdx)).format(
-            "MMMM YYYY"
-          )}
-        </p>
-        <div>
-          <button onClick={handlePrevMonth}>
-            <span className="material-icons-outlined cursor-pointer text-gray-600 mx-2">
-              chevron_left
-            </span>
+      <header className="flex items-center justify-center space-x-2">
+
+        <button onClick={handlePrevMonth} className="border border-red-500 rounded-lg py-2 px-4 hover:bg-red-500 " >
+          <ChevronLeft className="h-3 w-3 hover:text-white transition duration-200" />
           </button>
-          <button onClick={handleNextMonth}>
-            <span className="material-icons-outlined cursor-pointer text-gray-600 mx-2">
-              chevron_right
-            </span>
+          <div className="flex text-center">
+            {dayjs(new Date(dayjs().year(), currentMonthIdx)).format("MMMM YYYY")}
+          </div>
+          
+          <button onClick={handleNextMonth}className="border border-red-500 rounded-lg py-2 px-4 hover:bg-red-500 " >
+          <ChevronRight className="h-3 w-3" />
           </button>
-        </div>
+
       </header>
       <div className="grid grid-cols-7 grid-rows-6">
         {currentMonth[0].map((day, i) => (
@@ -77,6 +76,7 @@ export default function SmallCalendar() {
                 onClick={() => {
                   setSmallCalendarMonth(currentMonthIdx);
                   setDaySelected(day);
+                  if (currentMonthIdx !== monthIndex) { setMonthIndex(currentMonthIdx); }
                 }}
                 className={`py-1 w-full ${getDayClass(day)}`}
               >

@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import useStore from "./useStore";
 import { X, Trash, MoreVertical } from "lucide-react"; // Importing icons from Lucide React
 
-const labelsClasses = ["indigo", "gray", "green", "blue", "red", "purple"];
+const labelsClasses = ["bg-indigo-500", "bg-gray-500", "bg-green-500", "bg-blue-500", "bg-red-500", "purple-500"];
 
 export default function EventModal() {
   const {
@@ -15,6 +15,7 @@ export default function EventModal() {
     selectedEvent,
   } = useStore();
 
+  // Set initial state for the form fields
   const [title, setTitle] = useState(selectedEvent ? selectedEvent.title : "");
   const [description, setDescription] = useState(
     selectedEvent ? selectedEvent.description : ""
@@ -25,6 +26,7 @@ export default function EventModal() {
       : labelsClasses[0]
   );
 
+  // Handle form submission for saving or updating an event
   function handleSubmit(e) {
     e.preventDefault();
     const calendarEvent = {
@@ -32,16 +34,18 @@ export default function EventModal() {
       description,
       label: selectedLabel,
       day: daySelected.valueOf(),
-      id: selectedEvent ? selectedEvent.id : Date.now(),
+      id: selectedEvent ? selectedEvent.id : Date.now(), // Unique ID for new events
     };
 
     if (selectedEvent) {
+      // Update the event if one is selected
       dispatchCalEvent({ type: "update", payload: calendarEvent });
     } else {
+      // Otherwise, push a new event
       dispatchCalEvent({ type: "push", payload: calendarEvent });
     }
 
-    setShowEventModal(false);
+    setShowEventModal(false); // Close the modal after saving/updating
   }
 
   if (!showEventModal) {
@@ -50,7 +54,7 @@ export default function EventModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <form className="bg-white rounded-lg shadow-lg w-1/3">
+      <form className="bg-white rounded-lg shadow-lg w-1/3" onSubmit={handleSubmit}>
         <header className="flex justify-between items-center px-4 py-2 bg-gray-100">
           <MoreVertical className="text-gray-400" />
           <div className="flex items-center space-x-3">
@@ -87,7 +91,9 @@ export default function EventModal() {
               className="w-full text-xl font-semibold text-gray-600 border-b-2 border-gray-200 focus:outline-none focus:border-blue-500"
               onChange={(e) => setTitle(e.target.value)}
             />
-            <p className="text-gray-500">{dayjs(daySelected).format("dddd, MMMM DD")}</p>
+            <p className="text-gray-500">
+              {dayjs(daySelected).format("dddd, MMMM DD")}
+            </p>
             <input
               type="text"
               name="description"
@@ -101,12 +107,18 @@ export default function EventModal() {
                 <span
                   key={i}
                   onClick={() => setSelectedLabel(lblClass)}
-                  className={`w-6 h-6 rounded-full bg-${lblClass}-500 cursor-pointer flex items-center justify-center`}
+                  className={`w-6 h-6 rounded-full ${lblClass} cursor-pointer flex items-center justify-center`}
                 >
                   {selectedLabel === lblClass && (
                     <span className="text-white text-sm">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M3.5 8.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z"/>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="12"
+                        height="12"
+                        fill="currentColor"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M3.5 8.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z" />
                       </svg>
                     </span>
                   )}
@@ -118,7 +130,6 @@ export default function EventModal() {
         <footer className="flex justify-end p-4 border-t bg-gray-100">
           <button
             type="submit"
-            onClick={handleSubmit}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             Save

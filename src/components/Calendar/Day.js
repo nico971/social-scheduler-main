@@ -9,9 +9,18 @@ export default function Day({ day, rowIdx }) {
     setDaySelected,
     setShowEventModal,
     filteredEvents,
+    setfilteredEvents,
     setSelectedEvent,
+    savedEvents
   } = useStore();
 
+  useEffect(() => {
+    const events = savedEvents.filter(
+      (evt) =>
+        dayjs(evt.day).format("DD-MM-YY") === day.format("DD-MM-YY")
+    );
+    setDayEvents(events);
+  }, [savedEvents, day]);
 
   function getCurrentDayClass() {
     return day.format("DD-MM-YY") === dayjs().format("DD-MM-YY")
@@ -42,7 +51,7 @@ export default function Day({ day, rowIdx }) {
           <div
             key={idx}
             onClick={() => setSelectedEvent(evt)}
-            className={`bg-${evt.label}-200 p-1 mr-3 text-gray-600 text-sm rounded mb-1 truncate`}
+            className={`${evt.label} p-1 mr-3 text-white text-sm rounded mb-1 truncate`}
           >
             {evt.title}
           </div>

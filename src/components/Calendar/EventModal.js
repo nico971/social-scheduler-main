@@ -1,10 +1,16 @@
-"use client";
-import React, { useState } from "react";
 import dayjs from "dayjs";
+import { MoreVertical, Trash, X } from "lucide-react"; // Importing icons from Lucide React
+import { useState } from "react";
 import useStore from "./useStore";
-import { X, Trash, MoreVertical } from "lucide-react"; // Importing icons from Lucide React
 
-const labelsClasses = ["bg-indigo-500", "bg-gray-500", "bg-green-500", "bg-blue-500", "bg-red-500", "purple-500"];
+const labelsClasses = [
+  "bg-indigo-500", 
+  "bg-gray-500", 
+  "bg-green-500", 
+  "bg-blue-500", 
+  "bg-red-500", 
+  "bg-purple-500"
+];
 
 export default function EventModal() {
   const {
@@ -13,9 +19,14 @@ export default function EventModal() {
     setShowEventModal,
     dispatchCalEvent,
     selectedEvent,
+    accounts, // Comptes disponibles
+    selectedAccount, // Compte sélectionné
+    setSelectedAccount, // Setter pour le compte
+    tags, // Liste des tags
+    addTag, // Fonction pour ajouter un tag
+    removeTag, // Fonction pour supprimer un tag
   } = useStore();
 
-  // Set initial state for the form fields
   const [title, setTitle] = useState(selectedEvent ? selectedEvent.title : "");
   const [description, setDescription] = useState(
     selectedEvent ? selectedEvent.description : ""
@@ -25,8 +36,8 @@ export default function EventModal() {
       ? labelsClasses.find((lbl) => lbl === selectedEvent.label)
       : labelsClasses[0]
   );
+  const [tagInput, setTagInput] = useState(""); // Pour l'ajout de tags
 
-  // Handle form submission for saving or updating an event
   function handleSubmit(e) {
     e.preventDefault();
     const calendarEvent = {
@@ -34,18 +45,21 @@ export default function EventModal() {
       description,
       label: selectedLabel,
       day: daySelected.valueOf(),
-      id: selectedEvent ? selectedEvent.id : Date.now(), // Unique ID for new events
+      account: selectedAccount, // Ajoute le compte à l'événement
+      tags: tags, // Ajoute les tags à l'événement
+      id: selectedEvent ? selectedEvent.id : Date.now(),
     };
 
-    if (selectedEvent) {
-      // Update the event if one is selected
-      dispatchCalEvent({ type: "update", payload: calendarEvent });
-    } else {
-      // Otherwise, push a new event
-      dispatchCalEvent({ type: "push", payload: calendarEvent });
-    }
+    dispatchCalEvent({ type: selectedEvent ? "update" : "push", payload: calendarEvent });
+    setShowEventModal(false); // Fermer la modal après l'ajout ou la mise à jour
+  }
 
-    setShowEventModal(false); // Close the modal after saving/updating
+  function handleAddTag(e) {
+    e.preventDefault();
+    if (tagInput.trim() && !tags.includes(tagInput)) {
+      addTag(tagInput);
+      setTagInput(""); // Vide le champ après l'ajout du tag
+    }
   }
 
   if (!showEventModal) {
@@ -102,28 +116,57 @@ export default function EventModal() {
               className="w-full text-gray-600 border-b-2 border-gray-200 focus:outline-none focus:border-blue-500"
               onChange={(e) => setDescription(e.target.value)}
             />
-            <div className="flex space-x-2">
-              {labelsClasses.map((lblClass, i) => (
-                <span
-                  key={i}
-                  onClick={() => setSelectedLabel(lblClass)}
-                  className={`w-6 h-6 rounded-full ${lblClass} cursor-pointer flex items-center justify-center`}
-                >
-                  {selectedLabel === lblClass && (
-                    <span className="text-white text-sm">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="12"
-                        height="12"
-                        fill="currentColor"
-                        viewBox="0 0 16 16"
-                      >
-                        <path d="M3.5 8.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z" />
-                      </svg>
-                    </span>
-                  )}
-                </span>
+
+            {/* Liste déroulante pour les comptes */}
+            <label className="block text-gray-600">Select Account</label>
+            <select
+              value={selectedAccount || ""}
+              onChange={(e) => setSelectedAccount(e.target.value)}
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="" disabled>Select account</option>
+              {accounts.map((account, i) => (
+                <option key={i} value={account}>
+                  {account}
+                </option>
               ))}
+            </select>
+
+            {/* Champ pour les tags */}
+            <div>
+              <label className="block text-gray-600">Tags</label>
+              <div className="flex items-center">
+                <input
+                  type="text"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  placeholder="Add a tag"
+                  className="w-full p-2 border-b-2 border-gray-200 focus:outline-none focus:border-blue-500"
+                />
+                <button
+                  className="ml-2 bg-blue-500 text-white px-4 py-2 rounded"
+                  onClick={handleAddTag}
+                >
+                  Add Tag
+                </button>
+              </div>
+              {/* Afficher les tags ajoutés */}
+              <div className="mt-2 flex flex-wrap">
+                {tags.map((tag, i) => (
+                  <span
+                    key={i}
+                    className="flex items-center bg-gray-200 text-sm rounded-full px-3 py-1 m-1"
+                  >
+                    {tag}
+                    <button
+                      onClick={() => removeTag(tag)}
+                      className="ml-2 text-red-500"
+                    >
+                      x
+                    </button>
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>

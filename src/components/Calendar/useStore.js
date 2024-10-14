@@ -1,5 +1,5 @@
-import { create } from "zustand";
 import dayjs from "dayjs";
+import { create } from "zustand";
 
 // Initialize events from localStorage
 function initEvents() {
@@ -19,7 +19,20 @@ const useStore = create((set, get) => ({
   selectedEvent: null,
   savedEvents: initEvents(), // Initialize with events from localStorage
   filteredEvents: [], // Initialize an empty array for filtered events
-  labels: ["e"],
+  labels: [],
+  accounts: ["Facebook", "Instagram", "LinkedIn"], // Liste des comptes
+  selectedAccount: null,
+  tags: [], // Liste des tags
+
+  setSelectedAccount: (account) => set({ selectedAccount: account }),
+  
+  addTag: (tag) => set((state) => ({
+    tags: [...state.tags, tag]
+  })),
+  
+  removeTag: (tagToRemove) => set((state) => ({
+    tags: state.tags.filter(tag => tag !== tagToRemove)
+  })),
   
   // Methods to update state
   setMonthIndex: (index) => set((state) => {
@@ -49,7 +62,7 @@ const useStore = create((set, get) => ({
           break;
         case 'delete':
           newEvents = state.savedEvents.filter((evt) => evt.id !== event.payload.id);
-          break;
+          return { savedEvents: newEvents, selectedEvent: null };
         default:
           throw new Error();
       }

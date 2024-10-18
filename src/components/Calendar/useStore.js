@@ -33,6 +33,14 @@ const useStore = create((set, get) => ({
   removeTag: (tagToRemove) => set((state) => ({
     tags: state.tags.filter(tag => tag !== tagToRemove)
   })),
+/*
+  extractAccount: () => {
+    const { savedEvents } = get();
+    // Extraction des labels uniques depuis les événements sauvegardés
+    const allAccounts = savedEvents.map(evt => evt.account);
+    const uniqueAccounts = [...new Set(allAccounts)]; // Supprimer les doublons
+    set({ accounts: uniqueAccounts }); // Mettre à jour l'état avec les labels uniques
+  },*/
   
   // Methods to update state
   setMonthIndex: (index) => set((state) => {
@@ -72,6 +80,8 @@ const useStore = create((set, get) => ({
 
       return { savedEvents: newEvents };
     });
+
+    //get().extractAccount();
 
     // Update filtered events after dispatching a new event
     get().setFilteredEvents();

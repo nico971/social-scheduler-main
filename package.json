@@ -11,6 +11,7 @@
   "dependencies": {
     "@auth/prisma-adapter": "^1.5.0",
     "@prisma/client": "^5.11.0",
+    "@trigger.dev/sdk": "^3.0.12",
     "axios": "^1.6.2",
     "bcrypt": "^5.0.1",
     "date-fns": "^3.4.0",
@@ -35,6 +36,7 @@
     "zustand": "^5.0.0-rc.2"
   },
   "devDependencies": {
+    "@trigger.dev/build": "^3.0.12",
     "@types/bcrypt": "^5.0.2",
     "@types/node": "^20.11.27",
     "@types/nodemailer": "^6.4.14",

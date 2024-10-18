@@ -1,15 +1,12 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import ToasterContext from "@/app/api/contex/ToasetContex";
 import CalendarHeader from "@/components/Calendar/CalendarHeader";
-import Breadcrumb from "@/components/Common/Breadcrumb";
-import { authOptions } from "@/utils/auth"; // Chemin vers tes options NextAuth
-import { getServerSession } from "next-auth/next";
-import { getMonth } from "@/utils/dayjs";
-import Sidebar from "@/components/Calendar/Sidebar";
-import Month from "@/components/Calendar/Month";
 import EventModal from "@/components/Calendar/EventModal";
+import Month from "@/components/Calendar/Month";
+import Sidebar from "@/components/Calendar/Sidebar";
 import useStore from "@/components/Calendar/useStore"; // Import du store Zustand
+import Breadcrumb from "@/components/Common/Breadcrumb";
+import { getMonth } from "@/utils/dayjs";
+import { useEffect, useState } from "react";
 
 const CalendarPage = () => {
   const [currentMonth, setCurrentMonth] = useState(getMonth());

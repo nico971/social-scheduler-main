@@ -1,14 +1,11 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider          = "postgresql"
   url               = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL") // Only needed when using a cloud provider that doesn't support the creation of new databases, like Heroku. Learn more: https://pris.ly/d/migrate-shadow
-}
-
-generator client {
-  provider = "prisma-client-js"
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model Account {
@@ -17,15 +14,14 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -48,6 +44,7 @@ model User {
   passwordResetToken    String?   @unique
   passwordResetTokenExp DateTime?
   accounts              Account[]
+  Member                Member[]
   sessions              Session[]
 }
 
@@ -57,4 +54,50 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Member {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id         String?       @db.VarChar(255)
+  organisation_id String?       @db.Uuid
+  role_id         String?       @db.Uuid
+  joined_at       DateTime?     @default(now()) @db.Timestamptz(6)
+  Organisation    Organisation? @relation(fields: [organisation_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Role            Role?         @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  User            User?         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  TeamMember      TeamMember[]
+}
+
+model Organisation {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String    @db.VarChar(255)
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at DateTime? @default(now()) @db.Timestamptz(6)
+  Member     Member[]
+  Team       Team[]
+}
+
+model Role {
+  id     String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name   String   @db.VarChar(50)
+  Member Member[]
+}
+
+model Team {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organisation_id String?       @db.Uuid
+  name            String        @db.VarChar(255)
+  created_at      DateTime?     @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime?     @default(now()) @db.Timestamptz(6)
+  Organisation    Organisation? @relation(fields: [organisation_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  TeamMember      TeamMember[]
+}
+
+model TeamMember {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  member_id String?   @db.Uuid
+  team_id   String?   @db.Uuid
+  joined_at DateTime? @default(now()) @db.Timestamptz(6)
+  Member    Member?   @relation(fields: [member_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Team      Team?     @relation(fields: [team_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }

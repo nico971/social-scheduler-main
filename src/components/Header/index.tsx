@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import AdminMenu from "@/components/Admin/AdminMenu"
 
 import menuData from "./menuData";
 
@@ -293,8 +294,9 @@ const Header = () => {
                         !sticky && pathUrl === "/" ? "text-white" : "text-dark"
                       }`}
                     >
-                      {session?.user?.name}
+                      <AdminMenu/>
                     </p>
+                    
                     {pathUrl !== "/" || sticky ? (
                       <button
                         onClick={() => signOut()}
